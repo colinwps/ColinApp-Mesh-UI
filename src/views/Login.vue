@@ -19,6 +19,33 @@
             prefix-icon="Lock"
           />
         </el-form-item>
+        <el-form-item prop="verifyCode">
+          <div class="verify-code-container">
+            <el-input
+              v-model="form.verifyCode"
+              placeholder="Verification Code"
+              prefix-icon="Message"
+              class="verify-input"
+            />
+            <div class="verify-image-container">
+              <img
+                v-if="verifyImage"
+                :src="verifyImage"
+                alt="Verification Code"
+                class="verify-image"
+                @click="refreshVerifyCode"
+                title="Click to refresh"
+              />
+              <el-button
+                class="refresh-button"
+                @click="refreshVerifyCode"
+                :disabled="codeButtonDisabled"
+              >
+                <svg-icon name="refresh" class="refresh-icon" />
+              </el-button>
+            </div>
+          </div>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" native-type="submit">Login</el-button>
         </el-form-item>
@@ -33,37 +60,91 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
+import api from '@/api/index.js'
 
 const router = useRouter()
 const form = reactive({
   username: '',
   password: '',
+  verifyCode: '',
 })
 
 const rules = {
   username: [{ required: true, message: 'Please enter username', trigger: 'blur' }],
   password: [{ required: true, message: 'Please enter password', trigger: 'blur' }],
+  verifyCode: [{ required: true, message: 'Please enter verification code', trigger: 'blur' }],
 }
 
 const formRef = ref(null)
 const errorMessage = ref('')
+const verifyImage = ref('')
+const codeButtonDisabled = ref(false)
+const particlesContainer = ref(null)
+
+const fetchVerifyCode = async () => {
+  try {
+    codeButtonDisabled.value = true
+    // Replace with your actual backend endpoint
+    const response = await api.get('/Account/captcha')
+
+    // Convert array buffer to Base64
+    /*
+    const base64Image = `data:image/png;base64,${btoa(
+      new Uint8Array(response.data.data.base64Image).reduce((data, byte) => data + String.fromCharCode(byte), '')
+    )}`
+
+    verifyImage.value = base64Image
+    */
+
+    verifyImage.value = response.data.data.base64Image
+
+    ElMessage.success('Verification code loaded')
+
+    // Cooldown for refresh button (5 seconds)
+    setTimeout(() => {
+      codeButtonDisabled.value = false
+    }, 5000)
+  } catch (error) {
+    console.error('Failed to fetch verification code:', error)
+    ElMessage.error('Failed to load verification code')
+    codeButtonDisabled.value = false
+  }
+}
+
+const refreshVerifyCode = () => {
+  if (!codeButtonDisabled.value) {
+    fetchVerifyCode()
+  }
+}
 
 const submitForm = () => {
-  formRef.value.validate((valid) => {
+  formRef.value.validate(async (valid) => {
     if (valid) {
-      if (form.username === 'admin' && form.password === '123456') {
-        ElMessage.success('Login successful!')
-        errorMessage.value = ''
-        localStorage.setItem('isAuthenticated', 'true')
-        router.push('/home')
-      } else {
-        errorMessage.value = 'Invalid username or password'
+      try {
+        // Replace with your actual backend login endpoint
+        const response = await axios.post('/api/login', {
+          username: form.username,
+          password: form.password,
+          verifyCode: form.verifyCode,
+        })
+
+        if (response.data.success) {
+          ElMessage.success('Login successful!')
+          errorMessage.value = ''
+          localStorage.setItem('isAuthenticated', 'true')
+          router.push('/home')
+        } else {
+          errorMessage.value = 'Invalid username, password, or verification code'
+          refreshVerifyCode()
+        }
+      } catch (error) {
+        errorMessage.value = 'Login failed. Please try again.'
+        refreshVerifyCode()
       }
     }
   })
 }
-
-const particlesContainer = ref(null)
 
 const createParticles = () => {
   const container = particlesContainer.value
@@ -83,6 +164,7 @@ const createParticles = () => {
 
 onMounted(() => {
   createParticles()
+  fetchVerifyCode()
 })
 </script>
 
@@ -168,6 +250,68 @@ onMounted(() => {
 .el-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 221, 235, 0.5);
+}
+
+.verify-code-container {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+}
+
+.verify-input {
+  flex: 1;
+}
+
+.verify-image-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.verify-image {
+  width: 100px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.verify-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(0, 221, 235, 0.4);
+}
+
+.refresh-button {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: linear-gradient(45deg, #ff4081, #00ddeb);
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.refresh-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 221, 235, 0.5);
+}
+
+.refresh-button:disabled {
+  background: rgba(255, 255, 255, 0.2);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.refresh-icon {
+  width: 20px;
+  height: 20px;
+  fill: #ffffff;
 }
 
 .error-message {
