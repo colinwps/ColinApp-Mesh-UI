@@ -9,13 +9,13 @@
       <div class="subtitle">AI + Everything</div>
       <el-form :model="form" :rules="rules" ref="formRef" @submit.prevent="submitForm">
         <el-form-item prop="username">
-          <el-input v-model="form.username" placeholder="Username" prefix-icon="User" />
+          <el-input v-model="form.username" placeholder="请输入用户名" prefix-icon="User" />
         </el-form-item>
         <el-form-item prop="password">
           <el-input
             v-model="form.password"
             type="password"
-            placeholder="Password"
+            placeholder="请输入密码"
             prefix-icon="Lock"
           />
         </el-form-item>
@@ -23,7 +23,7 @@
           <div class="verify-code-container">
             <el-input
               v-model="form.verifyCode"
-              placeholder="Verification Code"
+              placeholder="请输入验证码"
               prefix-icon="Message"
               class="verify-input"
             />
@@ -60,8 +60,11 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import api from '@/api/index.js'
+
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const router = useRouter()
 const form = reactive({
@@ -79,25 +82,17 @@ const rules = {
 const formRef = ref(null)
 const errorMessage = ref('')
 const verifyImage = ref('')
+const verifyGuide = ref('') // Placeholder for verification guide
 const codeButtonDisabled = ref(false)
 const particlesContainer = ref(null)
 
 const fetchVerifyCode = async () => {
   try {
     codeButtonDisabled.value = true
-    // Replace with your actual backend endpoint
     const response = await api.get('/Account/captcha')
 
-    // Convert array buffer to Base64
-    /*
-    const base64Image = `data:image/png;base64,${btoa(
-      new Uint8Array(response.data.data.base64Image).reduce((data, byte) => data + String.fromCharCode(byte), '')
-    )}`
-
-    verifyImage.value = base64Image
-    */
-
-    verifyImage.value = response.data.data.base64Image
+    verifyImage.value = response.data.base64Image
+    verifyGuide.value = response.data.captchaId // Assuming the API returns a guide
 
     ElMessage.success('Verification code loaded')
 
@@ -123,19 +118,29 @@ const submitForm = () => {
     if (valid) {
       try {
         // Replace with your actual backend login endpoint
-        const response = await axios.post('/api/login', {
-          username: form.username,
-          password: form.password,
-          verifyCode: form.verifyCode,
+        const response = await api.post('/Account/login', {
+          UserName: form.username,
+          Password: form.password,
+          CaptchaCode: form.verifyCode,
+          CaptchaId: verifyGuide.value, // Assuming the API requires this
         })
 
-        if (response.data.success) {
-          ElMessage.success('Login successful!')
+        if (response.code === 200) {
+          //ElMessage.success('登录成功，页面跳转中...')
           errorMessage.value = ''
           localStorage.setItem('isAuthenticated', 'true')
-          router.push('/home')
+          userStore.setUserInfo({
+            token: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            tokenExpire: response.data.expiresIn,
+            userId: response.data.userId,
+            userName: response.data.userName,
+            userRole: response.data.userRole,
+            userAvatar: response.data.userAvatar,
+          })
+          router.push('/index')
         } else {
-          errorMessage.value = 'Invalid username, password, or verification code'
+          errorMessage.value = response.msg || 'Login failed. Please try again.'
           refreshVerifyCode()
         }
       } catch (error) {
