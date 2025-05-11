@@ -94,7 +94,7 @@ const fetchVerifyCode = async () => {
     verifyImage.value = response.data.base64Image
     verifyGuide.value = response.data.captchaId // Assuming the API returns a guide
 
-    ElMessage.success('Verification code loaded')
+    // ElMessage.success('Verification code loaded')
 
     // Cooldown for refresh button (5 seconds)
     setTimeout(() => {
@@ -138,7 +138,7 @@ const submitForm = () => {
             userRole: response.data.userRole,
             userAvatar: response.data.userAvatar,
           })
-          router.push('/index')
+          router.push('/')
         } else {
           errorMessage.value = response.msg || 'Login failed. Please try again.'
           refreshVerifyCode()

@@ -8,17 +8,16 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="app">
-    <router-view></router-view>
+  <div class="app-container">
+    <router-view />
   </div>
 </template>
 
 <style scoped>
-#app {
-  height: 100vh;
-  width: 100vw;
+.app-container {
   margin: 0;
   padding: 0;
-  overflow: auto;
+  width: 100%;
+  height: 100%;
 }
 </style>

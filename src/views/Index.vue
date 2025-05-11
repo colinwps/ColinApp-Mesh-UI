@@ -120,12 +120,9 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
-html,
-body,
-#app,
 .layout-container {
-  height: 100vh;
   width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background: #0f172a;
@@ -136,15 +133,7 @@ body,
   flex: 1;
   display: flex;
   width: 100%;
-}
-
-.el-main.main {
-  flex: 1;
-  height: 100%;
-  width: 100%;
-  overflow-y: auto;
-  padding: 0; /* remove default 20px padding */
-  background: #1e293b;
+  overflow: hidden; /* 防止子元素溢出 */
 }
 
 .header {
@@ -197,9 +186,9 @@ body,
 
 .main {
   flex: 1;
-  overflow-y: auto;
-  padding: 20px;
+  padding: 0; /* 移除 padding: 20px */
   background: #1e293b;
+  overflow-y: auto;
 }
 
 .home-content,
@@ -208,12 +197,14 @@ body,
   color: #e2e8f0;
   padding: 20px;
   border-radius: 10px;
-  min-height: 400px;
+  min-height: 100%; /* 占满 main 高度 */
+  box-sizing: border-box;
 }
 
 :deep(.el-tabs__header) {
   background: #1e293b;
   border-radius: 8px 8px 0 0;
+  margin: 0;
 }
 
 :deep(.el-tabs__item) {
@@ -223,5 +214,12 @@ body,
 :deep(.el-tabs__item.is-active) {
   background: #38bdf8;
   color: #0f172a;
+}
+
+/* 确保 tabs 内容不溢出 */
+:deep(.el-tabs__content) {
+  width: 100%;
+  height: 100%;
+  padding: 0;
 }
 </style>
