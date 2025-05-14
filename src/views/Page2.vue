@@ -1,7 +1,7 @@
 <template>
   <div class="page">
-    <h2>欢迎使用后台管理系统</h2>
-    <p>这是默认主页</p>
+    <h2>页面2</h2>
+    <p>这是页面2的内容</p>
   </div>
 </template>
 

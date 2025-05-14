@@ -10,19 +10,35 @@ const router = createRouter({
     {
       path: '/login',
       name: 'Login',
-      component: Login,
-    },
-    {
-      path: '/home',
-      name: 'Home',
-      component: Home,
-      meta: { requiresAuth: true },
+      component: () => import('@/views/Login.vue'),
+      meta: { requiresAuth: false },
     },
     {
       path: '/',
-      name: 'Index',
-      component: Index,
+      name: 'Layout',
+      component: () => import('../components/Layout.vue'),
+      redirect: '/home',
       meta: { requiresAuth: true },
+      children: [
+        {
+          path: '/home',
+          name: 'Home',
+          component: () => import('../views/Home.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: '/Page1',
+          name: 'page1',
+          component: Home,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: '/Page2',
+          name: 'page2',
+          component: Home,
+          meta: { requiresAuth: true },
+        },
+      ],
     },
   ],
 })
