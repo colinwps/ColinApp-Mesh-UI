@@ -173,7 +173,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .login-page {
   min-height: 100vh;
   width: 100vw;
