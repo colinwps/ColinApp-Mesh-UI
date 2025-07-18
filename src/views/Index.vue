@@ -1,10 +1,10 @@
 <template>
-  <el-container style="height: 100vh">
+  <el-container style="height: 100vh; width: 100vw">
     <!-- Sidebar -->
     <el-aside :width="isCollapse ? '64px' : '200px'" class="sidebar">
       <el-menu
         :default-active="activeMenu"
-        class="el-menu-vertical-demo"
+        class="colinapp-menu"
         :collapse="isCollapse"
         @select="handleMenuSelect"
       >
@@ -24,7 +24,7 @@
     </el-aside>
 
     <!-- Main layout -->
-    <el-container>
+    <el-container style="width: auto">
       <!-- Header -->
       <el-header class="header">
         <div class="left">
@@ -32,7 +32,7 @@
             <Fold v-if="!isCollapse" />
             <Expand v-else />
           </el-icon>
-          <span class="system-name">后台管理系统</span>
+          <span class="system-name">OmniMind OS 系统</span>
         </div>
         <div class="right">
           <el-dropdown>

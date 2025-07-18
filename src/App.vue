@@ -8,16 +8,19 @@ onMounted(() => {
 </script>
 
 <template>
+  <router-view />
+  <!--
   <div class="app-container">
     <router-view />
   </div>
+  -->
 </template>
 
 <style scoped>
 .app-container {
   margin: 0;
   padding: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vh;
+  height: 100vh;
 }
 </style>
