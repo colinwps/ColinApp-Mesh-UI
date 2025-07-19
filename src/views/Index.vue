@@ -2,25 +2,25 @@
   <el-container style="height: 100vh; width: 100vw">
     <!-- Sidebar -->
     <el-aside :width="isCollapse ? '64px' : '200px'" class="sidebar">
-      <el-menu
-        :default-active="activeMenu"
-        class="colinapp-menu"
-        :collapse="isCollapse"
-        @select="handleMenuSelect"
-      >
-        <el-menu-item index="dashboard">
-          <el-icon><HomeFilled /></el-icon>
-          <span>Dashboard</span>
-        </el-menu-item>
-        <el-menu-item index="users">
-          <el-icon><User /></el-icon>
-          <span>Users</span>
-        </el-menu-item>
-        <el-menu-item index="settings">
-          <el-icon><Setting /></el-icon>
-          <span>Settings</span>
-        </el-menu-item>
-      </el-menu>
+      <el-scrollbar style="height: 100%">
+        <!-- Logo-->
+        <div class="logo" v-if="!isCollapse">
+          <img src="@/assets/logo.png" alt="Logo" style="width: 50%; height: auto; margin: 5px 0" />
+        </div>
+
+        <!-- Menu -->
+        <el-menu
+          :default-active="activeMenu"
+          class="colinapp-menu"
+          :collapse="isCollapse"
+          @select="handleMenuSelect"
+        >
+          <el-menu-item v-for="item in list" :key="item.name" :index="item.name">
+            <el-icon><HomeFilled /></el-icon>
+            <span>{}</span>
+          </el-menu-item>
+        </el-menu>
+      </el-scrollbar>
     </el-aside>
 
     <!-- Main layout -->
@@ -62,13 +62,64 @@
 
 <script setup>
 import { ref } from 'vue'
-import { Fold, Expand, HomeFilled, User, Setting, ArrowDown } from '@element-plus/icons-vue'
+// 导入 Element Plus 的图标组件（根据需要动态引入）
+import { HomeFilled, Folder, Document, Delete, Memo, Setting, User } from '@element-plus/icons-vue'
 
 const isCollapse = ref(false)
 const username = 'Admin'
 const activeMenu = ref('dashboard')
 const activeTab = ref('dashboard')
 const tabs = ref([{ name: 'dashboard', label: 'Dashboard', component: 'DashboardView' }])
+
+// 定义图标映射（可选）
+const icons = { HomeFilled, Folder, Document, Delete, Memo, Setting, User }
+
+const list = ref([
+  {
+    name: 'dashboard',
+    label: 'Dashboard',
+    component: 'DashboardView',
+    ico: 'HomeFilled',
+  },
+  {
+    name: 'projects',
+    label: 'Projects',
+    component: 'ProjectsView',
+    ico: 'Folder',
+    children: [
+      {
+        name: 'all-projects',
+        label: 'All Projects',
+        component: 'AllProjectsView',
+        ico: 'Document',
+      },
+      {
+        name: 'archived',
+        label: 'Archived',
+        component: 'ArchivedProjectsView',
+        ico: 'Delete',
+      },
+    ],
+  },
+  {
+    name: 'tasks',
+    label: 'Tasks',
+    component: 'TasksView',
+    ico: 'Memo',
+  },
+  {
+    name: 'settings',
+    label: 'Settings',
+    component: 'SettingsView',
+    ico: 'Setting',
+  },
+  {
+    name: 'profile',
+    label: 'Profile',
+    component: 'ProfileView',
+    ico: 'User',
+  },
+])
 
 function toggleCollapse() {
   isCollapse.value = !isCollapse.value
@@ -103,8 +154,8 @@ function logout() {
 
 <style lang="scss" scoped>
 .sidebar {
-  background-color: #2d3a4b;
-  color: #fff;
+  background-color: #ffffff;
+  color: #ffffff;
 }
 
 .header {
