@@ -32,7 +32,7 @@
             <Fold v-if="!isCollapse" />
             <Expand v-else />
           </el-icon>
-          <span class="system-name">OmniMind OS 系统</span>
+          <span class="system-name">AI 视频监控平台</span>
         </div>
         <div class="right">
           <el-dropdown>
@@ -63,7 +63,7 @@
 <script setup>
 import { ref } from 'vue'
 // 导入 Element Plus 的图标组件（根据需要动态引入）
-import { HomeFilled, Folder, Document, Delete, Memo, Setting, User } from '@element-plus/icons-vue'
+import { HomeFilled, Folder, Document, Delete, Memo, Setting, User, Expand, Fold } from '@element-plus/icons-vue'
 
 const isCollapse = ref(false)
 const username = 'Admin'
@@ -162,7 +162,7 @@ function logout() {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fff;
+  background: #125ae0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 0 20px;
 }
@@ -180,5 +180,8 @@ function logout() {
 
 .header .right {
   font-size: 14px;
+}
+.system-name{
+  color: #ffffff;
 }
 </style>
